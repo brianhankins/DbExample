@@ -14,17 +14,18 @@ namespace WebApplication2.Controllers
     public class PersonController : ApiController
     {
         [HttpGet]
-        [Route("{name}")]
+        [Route("")]
         public List<Person> Test()
         {
             var people = new List<Person>();
 
-            var connectionString = "";
+            var connectionString = "Server=localhost;Database=TestDb;Trusted_Connection=True;";
             var connection = new SqlConnection(connectionString);
             var sql = "SELECT * FROM testdb..Persons";
 
             var command = new SqlCommand(sql, connection);
             command.CommandType = CommandType.Text;
+            connection.Open();
             var reader = command.ExecuteReader();
             while (reader.Read())
             {
@@ -35,6 +36,7 @@ namespace WebApplication2.Controllers
                 var person = new Person(firstName, lastName, ageOfPerson, isCool);
                 people.Add(person);
             }
+            connection.Close();
             return people;
         }
     }
