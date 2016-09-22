@@ -20,23 +20,25 @@ namespace WebApplication2.Controllers
             var people = new List<Person>();
 
             var connectionString = "Server=localhost;Database=TestDb;Trusted_Connection=True;";
-            var connection = new SqlConnection(connectionString);
             var sql = "SELECT * FROM testdb..Persons";
-
-            var command = new SqlCommand(sql, connection);
-            command.CommandType = CommandType.Text;
-            connection.Open();
-            var reader = command.ExecuteReader();
-            while (reader.Read())
+            using (var connection = new SqlConnection(connectionString))
+            using (var command = new SqlCommand(sql, connection))
             {
-                var firstName = reader["firstName"].ToString();
-                var lastName = reader["lastName"].ToString();
-                var ageOfPerson = (int)reader["age"];
-                var isCool = (bool)reader["isCool"];
-                var person = new Person(firstName, lastName, ageOfPerson, isCool);
-                people.Add(person);
+                command.CommandType = CommandType.Text;
+                connection.Open();
+                var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    var firstName = reader["firstName"].ToString();
+                    var lastName = reader["lastName"].ToString();
+                    var ageOfPerson = (int)reader["age"];
+                    var isCool = (bool)reader["isCool"];
+                    var person = new Person(firstName, lastName, ageOfPerson, isCool);
+                    people.Add(person);
+                }
+                connection.Close();
             }
-            connection.Close();
+
             return people;
         }
     }
